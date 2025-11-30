@@ -1,4 +1,4 @@
-import MyApp.getClass
+//import MyApp.getClass
 import com.github.tototoshi.csv.CSVReader
 
 import java.io.File
@@ -15,11 +15,12 @@ object CSVLoader:
 
             HotelBooking(
               hotelName = row.getOrElse("Hotel Name", "Unknown"),
-              originCountry = row.getOrElse("Origin Country", "Unknown"),
+              //originCountry = row.getOrElse("Origin Country", "Unknown"),
               destinationCountry = row.getOrElse("Destination Country", "Unknown"),
               bookingPrice = row.getOrElse("Booking Price[SGD]", "0").toDouble,
               discount = parseDiscountString.toDouble,
-              profitMargin = row.getOrElse("Profit Margin", "0").toDouble
+              profitMargin = row.getOrElse("Profit Margin", "0").toDouble,
+              noOfVisitors = row.getOrElse("No of Visitors", "0").toInt
             )
           }.toOption
         }
