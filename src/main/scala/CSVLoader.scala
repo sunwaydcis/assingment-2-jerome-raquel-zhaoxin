@@ -20,7 +20,7 @@ object CSVLoader:
               bookingPrice = row.getOrElse("Booking Price[SGD]", "0").toDouble,
               discount = parseDiscountString.toDouble,
               profitMargin = row.getOrElse("Profit Margin", "0").toDouble,
-              noOfVisitors = row.getOrElse("No of Visitors", "0").toInt
+              noOfVisitors = row.getOrElse("No. Of People", "0").toInt
             )
           }.toOption
         }
