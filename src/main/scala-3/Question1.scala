@@ -12,15 +12,10 @@ object Question1:
       val(country, list) = grouped.maxBy(_._2.size)
       result(country, list.size)
 
-  // Uses pattern matching on Success and Failure to ensure safe execution
-  def run(): Unit =
-    CSVLoader.loadHotelData() match
-      case Success(bookings) =>
-        val result = analyze(bookings)
-        println("[Country with Highest Number of Bookings]")
-        println(s"- Country: ${result.country}")
-        println(s"- Total Bookings: ${result.total}")
-      case Failure(ex) =>
-        println("Failed to load CSV: " + ex.getMessage)
+  def run(bookings: List[HotelBooking]): Unit =
+      val result = analyze(bookings)
+      println("[Country with Highest Number of Bookings]")
+      println(s"- Country: ${result.country}")
+      println(s"- Total Bookings: ${result.total}")
 
 end Question1
