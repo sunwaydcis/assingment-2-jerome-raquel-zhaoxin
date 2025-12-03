@@ -12,9 +12,12 @@ object Question2 {
       .groupBy(_.hotelName)
       .values
       .map { bookingList =>
-        val avgPrice = bookingList.map(_.bookingPrice).sum / bookingList.size
-        val avgDiscount = bookingList.map(_.discount).sum / bookingList.size
-        val avgProfitMargin = bookingList.map(_.profitMargin).sum / bookingList.size
+        val totalRooms = bookingList.map(_.rooms).sum
+        val totalBookingPrice = bookingList.map(_.bookingPrice).sum
+
+        val avgPrice = totalBookingPrice / totalRooms
+        val avgDiscount = bookingList.map(b => b.discount * b.bookingPrice).sum / totalBookingPrice
+        val avgProfitMargin = bookingList.map(b => b.profitMargin * b.bookingPrice).sum / totalBookingPrice
 
         val finalPrice = avgPrice * (1 - avgDiscount / 100)
         val economicalScore = finalPrice * (1 + avgProfitMargin / 100)
