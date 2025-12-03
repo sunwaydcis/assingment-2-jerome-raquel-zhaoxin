@@ -5,7 +5,7 @@ object Question1:
     val res =
       bookings
         .groupBy(_.destinationCountry)
-        .mapValues(_.size)
+        .view.mapValues(_.size)
         .maxByOption(_._2)
         .map(Result.apply)
         .getOrElse(Result("N/A", 0))
