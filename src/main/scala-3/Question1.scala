@@ -15,5 +15,5 @@ object Question1:
     println(s"- Total Bookings: ${res.total}")
 
     res // return value
-
+  end findTopBookingCountry
 end Question1
