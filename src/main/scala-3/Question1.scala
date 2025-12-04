@@ -1,21 +1,19 @@
-import scala.util.{Success, Failure}
-
 object Question1:
-  case class result(country: String, total: Int)
+  case class Result(country: String, total: Int)
 
-  def analyze(bookings: List[HotelBooking]): result =
-    val grouped = bookings.groupBy(_.destinationCountry)
-    if grouped.isEmpty then
-      result("N/A", 0)
-    else
-      // maxBy finds the country with the largest number of bookings
-      val(country, list) = grouped.maxBy(_._2.size)
-      result(country, list.size)
+  def findTopBookingCountry(bookings: List[HotelBooking]): Result =
+    val res =
+      bookings
+        .groupBy(_.destinationCountry)
+        .view.mapValues(_.size)
+        .maxByOption(_._2)
+        .map(Result.apply)
+        .getOrElse(Result("N/A", 0))
 
-  def run(bookings: List[HotelBooking]): Unit =
-      val result = analyze(bookings)
-      println("[Country with Highest Number of Bookings]")
-      println(s"- Country: ${result.country}")
-      println(s"- Total Bookings: ${result.total}")
+    println("[Country with Highest Number of Bookings]")
+    println(s"- Country: ${res.country}")
+    println(s"- Total Bookings: ${res.total}")
 
+    res // return value
+  end findTopBookingCountry
 end Question1

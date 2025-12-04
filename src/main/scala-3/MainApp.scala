@@ -6,7 +6,7 @@ object MainApp:
     println("----------Hotel Booking Analysis----------\n")
     CSVLoader.loadFile("/Hotel_Dataset.csv") match
       case Success(bookings) =>
-        Question1.run(bookings)
+        val question1 = Question1.findTopBookingCountry(bookings)
         val question2 = Question2.calculateEconomicScore(bookings)
         println(s"The most economical hotel is ${question2.get.hotelName}")
         val question3 = Question3.calculateHotelPerformance(bookings)
