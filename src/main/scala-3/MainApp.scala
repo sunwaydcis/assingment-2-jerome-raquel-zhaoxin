@@ -9,8 +9,8 @@ object MainApp:
         Question1.run(bookings)
         val question2 = Question2.calculateEconomicScore(bookings)
         println(s"The most economical hotel is ${question2.get.hotelName}")
-        val question3result = Question3.calculateMostProfitableHotel(bookings)
-        println(question3result)
+        val question3 = Question3.calculateHotelPerformance(bookings)
+        println(s"The highest performing hotel is ${question3.get.hotelName}")
       case Failure(ex) =>
         println("Failed to load CSV: " + ex.getMessage)
   }
