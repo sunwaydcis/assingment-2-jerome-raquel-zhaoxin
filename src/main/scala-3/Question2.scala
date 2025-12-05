@@ -1,4 +1,6 @@
-object Question2 {
+import Utils.*
+
+object Question2:
 
   case class EconomicalScore(
     hotelName: String,
@@ -17,52 +19,43 @@ object Question2 {
   )
 
   def calculateEconomicScore(bookings: List[HotelBooking]): Option[EconomicScorePercentage] =
-    if bookings.isEmpty then return None
+    if bookings.isEmpty then None
 
     val scores =
-      bookings
-        .groupBy(b => (b.hotelName, b.destinationCountry, b.destinationCity))
-        .map { case ((hotelName, destinationCountry, destinationCity), bs) =>
+      groupByHotel(bookings).map { case ((hotelName, country, city), bs) =>
 
-          val effective = bs.map(b => b.bookingPrice / b.rooms / b.noOfDays)
+        val effectivePrices = bs.map(b => b.bookingPrice / b.rooms / b.noOfDays)
 
-          EconomicalScore(
-            hotelName,
-            destinationCountry,
-            destinationCity,
-            averagePrice = effective.sum / effective.length,
-            averageDiscount = bs.map(_.discount).sum / bs.length,
-            averageProfitMargin = bs.map(_.profitMargin).sum / bs.length
-          )
-        }
-        .toList
+        EconomicalScore(
+          hotelName,
+          country,
+          city,
+          averagePrice        = effectivePrices.sum / effectivePrices.length,
+          averageDiscount     = bs.map(_.discount).sum / bs.length,
+          averageProfitMargin = bs.map(_.profitMargin).sum / bs.length
+        )
+      }.toList
 
-    val minP = scores.map(_.averagePrice).min
-    val maxP = scores.map(_.averagePrice).max
-    val rangeP = maxP - minP
+    val (minP, maxP)  = minMax(scores)(_.averagePrice)
+    val (minD, maxD)  = minMax(scores)(_.averageDiscount)
+    val (minPM, maxPM)= minMax(scores)(_.averageProfitMargin)
 
-    val minD = scores.map(_.averageDiscount).min
-    val maxD = scores.map(_.averageDiscount).max
-    val rangeD = maxD - minD
+    val finalScores = scores.map { s =>
+      val priceNorm   = safeNorm(s.averagePrice,        minP,  maxP)
+      val discountNorm= safeNorm(s.averageDiscount,     minD,  maxD)
+      val profitNorm  = safeNorm(s.averageProfitMargin, minPM, maxPM)
 
-    val minPM = scores.map(_.averageProfitMargin).min
-    val maxPM = scores.map(_.averageProfitMargin).max
-    val rangePM = maxPM - minPM
+      val combined =
+        (1 - priceNorm + discountNorm + 1 - profitNorm) / 3
 
-    def safeNorm(x: Double, min: Double, range: Double): Double =
-      if range == 0 then 0.0 else (x - min) / range
-
-    val finals = scores.map { s =>
-      val priceNorm = safeNorm(s.averagePrice, minP, rangeP)
-      val discountNorm = safeNorm(s.averageDiscount, minD, rangeD)
-      val profitNorm = safeNorm(s.averageProfitMargin, minPM, rangePM)
-
-      val combined = (1 - priceNorm + discountNorm + 1 - profitNorm) / 3
-
-      EconomicScorePercentage(s.hotelName, s.destinationCountry, s.destinationCity, combined)
+      EconomicScorePercentage(
+        s.hotelName,
+        s.destinationCountry,
+        s.destinationCity,
+        combined
+      )
     }
 
-
-    Some(finals.maxBy(_.score))
+    Some(finalScores.maxBy(_.score))
   end calculateEconomicScore
-}
+end Question2

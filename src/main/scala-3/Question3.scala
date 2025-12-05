@@ -1,52 +1,55 @@
-object Question3 {
+import Utils.*
+
+object Question3:
 
   case class HotelPerformance(
-    hotelName: String,
-    hotelCountry: String,
-    hotelCity: String,
-    averageVisitors: Double,
-    averageProfitMargin: Double
-  )
+     hotelName: String,
+     hotelCountry: String,
+     hotelCity: String,
+     averageVisitors: Double,
+     averageProfitMargin: Double
+   )
 
   case class HotelScore(
-   hotelName: String,
-   hotelCountry: String,
-   hotelCity: String,
-   score: Double
-  )
+     hotelName: String,
+     hotelCountry: String,
+     hotelCity: String,
+     score: Double
+   )
 
   def calculateHotelPerformance(bookings: List[HotelBooking]): Option[HotelScore] =
-    if bookings.isEmpty then return None
+    if bookings.isEmpty then None
 
-    // Step 1: group bookings by hotel and calculate averages
-    val stats = bookings.groupBy(b => (b.hotelName, b.destinationCountry, b.destinationCity)).map { case ((hotelName, destinationCountry, destinationCity), bs) =>
-      val avgVisitors = bs.map(_.noOfVisitors).sum.toDouble / bs.length
-      val avgProfitMargin = bs.map(_.profitMargin).sum.toDouble / bs.length
+    val stats =
+      groupByHotel(bookings).map { case ((hotelName, country, city), bs) =>
 
-      HotelPerformance(hotelName, hotelCountry = destinationCountry, hotelCity = destinationCity, avgVisitors, avgProfitMargin)
-    }.toList
+        val avgVisitors =
+          bs.map(_.noOfVisitors).sum.toDouble / bs.length
 
-    // Step 2: find min/max and ranges for normalization
-    val minVisitors = stats.map(_.averageVisitors).min
-    val maxVisitors = stats.map(_.averageVisitors).max
-    val rangeVisitors = maxVisitors - minVisitors
+        val avgProfitMargin =
+          bs.map(_.profitMargin).sum / bs.length
 
-    val minProfit = stats.map(_.averageProfitMargin).min
-    val maxProfit = stats.map(_.averageProfitMargin).max
-    val rangeProfit = maxProfit - minProfit
+        HotelPerformance(
+          hotelName,
+          country,
+          city,
+          avgVisitors,
+          avgProfitMargin
+        )
+      }.toList
 
-    def safeNorm(x: Double, min: Double, range: Double): Double =
-      if range == 0 then 0.0 else (x - min) / range
+    val (minV, maxV) = minMax(stats)(_.averageVisitors)
+    val (minP, maxP) = minMax(stats)(_.averageProfitMargin)
 
-    // Step 3: calculate final combined score
     val finalScores = stats.map { s =>
-      val visitorsNorm = safeNorm(s.averageVisitors, minVisitors, rangeVisitors)
-      val profitNorm = safeNorm(s.averageProfitMargin, minProfit, rangeProfit)
+      val visitorsNorm = safeNorm(s.averageVisitors,    minV, maxV)
+      val profitNorm   = safeNorm(s.averageProfitMargin,minP, maxP)
 
       val combined = (visitorsNorm + profitNorm) / 2
 
       HotelScore(s.hotelName, s.hotelCountry, s.hotelCity, combined)
     }
-    // Step 4: pick the hotel with the highest score
+
     Some(finalScores.maxBy(_.score))
-}
+  end calculateHotelPerformance
+end Question3
