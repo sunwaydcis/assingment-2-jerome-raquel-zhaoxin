@@ -1,6 +1,6 @@
 import Utils.*
 
-object Question2:
+object Question2 extends Question:
 
   case class EconomicalScore(
     hotelName: String,
@@ -58,4 +58,13 @@ object Question2:
 
     Some(finalScores.maxBy(_.score))
   end calculateEconomicScore
+
+  def printAnswer(bookings: List[HotelBooking]): Unit =
+    calculateEconomicScore(bookings) match
+      case Some(best) =>
+        println(s"The most economical hotel is ${best.hotelName} located in ${best.destinationCity}, ${best.destinationCountry}.")
+      case None =>
+        println("No bookings available to calculate the most economical hotel.")
+  end printAnswer
+  
 end Question2
