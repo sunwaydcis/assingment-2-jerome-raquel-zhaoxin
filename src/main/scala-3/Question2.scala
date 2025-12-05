@@ -1,31 +1,41 @@
 object Question2 {
 
   case class EconomicalScore(
-                              hotelName: String,
-                              averagePrice: Double,
-                              averageDiscount: Double,
-                              averageProfitMargin: Double
-                            )
+    hotelName: String,
+    destinationCountry: String,
+    destinationCity: String,
+    averagePrice: Double,
+    averageDiscount: Double,
+    averageProfitMargin: Double
+  )
 
   case class EconomicScorePercentage(
-                                      hotelName: String,
-                                      score: Double
-                                    )
+    hotelName: String,
+    destinationCountry: String,
+    destinationCity: String,
+    score: Double
+  )
 
   def calculateEconomicScore(bookings: List[HotelBooking]): Option[EconomicScorePercentage] =
     if bookings.isEmpty then return None
 
     val scores =
-      bookings.groupBy(_.hotelName).map { case (hotelName, bs) =>
-        val effective = bs.map(b => b.bookingPrice / b.rooms / b.noOfDays)
+      bookings
+        .groupBy(b => (b.hotelName, b.destinationCountry, b.destinationCity))
+        .map { case ((hotelName, destinationCountry, destinationCity), bs) =>
 
-        EconomicalScore(
-          hotelName,
-          averagePrice = effective.sum / effective.length,
-          averageDiscount = bs.map(_.discount).sum / bs.length,
-          averageProfitMargin = bs.map(_.profitMargin).sum / bs.length
-        )
-      }.toList
+          val effective = bs.map(b => b.bookingPrice / b.rooms / b.noOfDays)
+
+          EconomicalScore(
+            hotelName,
+            destinationCountry,
+            destinationCity,
+            averagePrice = effective.sum / effective.length,
+            averageDiscount = bs.map(_.discount).sum / bs.length,
+            averageProfitMargin = bs.map(_.profitMargin).sum / bs.length
+          )
+        }
+        .toList
 
     val minP = scores.map(_.averagePrice).min
     val maxP = scores.map(_.averagePrice).max
@@ -47,11 +57,11 @@ object Question2 {
       val discountNorm = safeNorm(s.averageDiscount, minD, rangeD)
       val profitNorm = safeNorm(s.averageProfitMargin, minPM, rangePM)
 
-      // invert price so cheaper → better score
       val combined = (1 - priceNorm + discountNorm + 1 - profitNorm) / 3
 
-      EconomicScorePercentage(s.hotelName, combined)
+      EconomicScorePercentage(s.hotelName, s.destinationCountry, s.destinationCity, combined)
     }
+
 
     Some(finals.maxBy(_.score))
   end calculateEconomicScore

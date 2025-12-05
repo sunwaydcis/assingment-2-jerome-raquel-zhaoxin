@@ -1,5 +1,5 @@
 object Question1:
-  case class Result(country: String, total: Int)
+  case class Result(country: String, totalBookings: Int)
 
   def findTopBookingCountry(bookings: List[HotelBooking]): Result =
     val res =
@@ -9,10 +9,6 @@ object Question1:
         .maxByOption(_._2)
         .map(Result.apply)
         .getOrElse(Result("N/A", 0))
-
-    println("[Country with Highest Number of Bookings]")
-    println(s"- Country: ${res.country}")
-    println(s"- Total Bookings: ${res.total}")
 
     res // return value
   end findTopBookingCountry

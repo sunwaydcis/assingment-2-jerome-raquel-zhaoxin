@@ -1,25 +1,29 @@
 object Question3 {
 
   case class HotelPerformance(
-                               hotelName: String,
-                               averageVisitors: Double,
-                               averageProfitMargin: Double
-                             )
+    hotelName: String,
+    hotelCountry: String,
+    hotelCity: String,
+    averageVisitors: Double,
+    averageProfitMargin: Double
+  )
 
   case class HotelScore(
-                         hotelName: String,
-                         score: Double
-                       )
+   hotelName: String,
+   hotelCountry: String,
+   hotelCity: String,
+   score: Double
+  )
 
   def calculateHotelPerformance(bookings: List[HotelBooking]): Option[HotelScore] =
     if bookings.isEmpty then return None
 
     // Step 1: group bookings by hotel and calculate averages
-    val stats = bookings.groupBy(_.hotelName).map { case (hotelName, bs) =>
+    val stats = bookings.groupBy(b => (b.hotelName, b.destinationCountry, b.destinationCity)).map { case ((hotelName, destinationCountry, destinationCity), bs) =>
       val avgVisitors = bs.map(_.noOfVisitors).sum.toDouble / bs.length
       val avgProfitMargin = bs.map(_.profitMargin).sum.toDouble / bs.length
 
-      HotelPerformance(hotelName, avgVisitors, avgProfitMargin)
+      HotelPerformance(hotelName, hotelCountry = destinationCountry, hotelCity = destinationCity, avgVisitors, avgProfitMargin)
     }.toList
 
     // Step 2: find min/max and ranges for normalization
@@ -41,9 +45,8 @@ object Question3 {
 
       val combined = (visitorsNorm + profitNorm) / 2
 
-      HotelScore(s.hotelName, combined)
+      HotelScore(s.hotelName, s.hotelCountry, s.hotelCity, combined)
     }
-
     // Step 4: pick the hotel with the highest score
     Some(finalScores.maxBy(_.score))
 }
