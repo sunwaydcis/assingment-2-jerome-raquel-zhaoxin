@@ -4,9 +4,8 @@ object Question1 extends Question:
   def findTopBookingCountry(bookings: List[HotelBooking]): Result =
     bookings
       .groupBy(_.destinationCountry)
-      .view.mapValues(_.size)
-      .maxByOption(_._2)
-      .map(Result.apply)
+      .map { case (country, list) => Result(country, list.length) }
+      .maxByOption(_.totalBookings)
       .getOrElse(Result("N/A", 0))
   end findTopBookingCountry
   
